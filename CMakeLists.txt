@@ -5,4 +5,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(TrabalhoPOO main.cpp
         ecra/Ecra.h
-        ecra/Ecra.cpp)
+        ecra/Ecra.cpp
+        terreno/terreno.cpp
+        terreno/terreno.h)

@@ -9,4 +9,5 @@ add_executable(TrabalhoPOO main.cpp
         terreno/terreno.cpp
         terreno/terreno.h
         posicao/Posicao.cpp
-        posicao/Posicao.h)
+        posicao/Posicao.h
+        settings/Settings.h)

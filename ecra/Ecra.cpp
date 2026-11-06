@@ -1,5 +1,4 @@
 #include "Ecra.h"
-#include "../settings/Settings.h"
 #include <iostream>
 
 // Construtor

@@ -1,4 +1,5 @@
 #include "Ecra.h"
+#include "../settings/Settings.h"
 #include <iostream>
 
 // Construtor
@@ -11,13 +12,13 @@ Ecra::Ecra(int nLinhas, int nColunas)
     if (linhasUsadas < 1)
         linhasUsadas = 1;
 
-    if (linhasUsadas > MAX_LINHAS)
+    if (linhasUsadas > Settings::ecra_max_linhas)
         linhasUsadas = MAX_LINHAS;
 
     if (colunasUsadas < 1)
         colunasUsadas = 1;
 
-    if (colunasUsadas > MAX_COLUNAS)
+    if (colunasUsadas > Settings::ecra_max_colunas)
         colunasUsadas = MAX_COLUNAS;
 
     limpa();

@@ -5,12 +5,36 @@
 
 #include <random>
 #include <stdexcept>
+#include <string>
 
 namespace {
     std::mt19937& obtemGerador() {
         static std::random_device dispositivo;
         static std::mt19937 gerador(dispositivo());
         return gerador;
+    }
+
+    void colocaAleatoriamente(
+        char mapa[][Settings::fabrica_max_colunas],
+        int linhas,
+        int colunas,
+        char tipo,
+        int quantidade
+    ) {
+        std::uniform_int_distribution<int> sorteiaLinha(0, linhas - 1);
+        std::uniform_int_distribution<int> sorteiaColuna(0, colunas - 1);
+
+        int colocados = 0;
+
+        while (colocados < quantidade) {
+            int linha = sorteiaLinha(obtemGerador());
+            int coluna = sorteiaColuna(obtemGerador());
+
+            if (mapa[linha][coluna] == '\0') {
+                mapa[linha][coluna] = tipo;
+                ++colocados;
+            }
+        }
     }
 }
 
@@ -21,47 +45,30 @@ Fabrica::Fabrica(int nLinhas, int nColunas)
 
     if (linhas < 1 || linhas > Settings::fabrica_max_linhas ||
         colunas < 1 || colunas > Settings::fabrica_max_colunas) {
-        throw std::invalid_argument("Dimensoes da fabrica invalidas.");
+        throw std::string("Dimensoes da fabrica invalidas.");
     }
 
-    const int numCrateras = Settings::fabrica_num_crateras;
-    const int numFerro = Settings::fabrica_num_depositos_ferro;
-    const int numSilicio = Settings::fabrica_num_depositos_silicio;
-    const int numGelo = Settings::fabrica_num_depositos_gelo;
-    const int totalEspeciais = numCrateras + numFerro + numSilicio + numGelo;
+    int numCrateras = Settings::fabrica_num_crateras;
+    int numFerro = Settings::fabrica_num_depositos_ferro;
+    int numSilicio = Settings::fabrica_num_depositos_silicio;
+    int numGelo = Settings::fabrica_num_depositos_gelo;
+    int totalEspeciais = numCrateras + numFerro + numSilicio + numGelo;
 
     if (numCrateras < 0 || numFerro < 0 || numSilicio < 0 || numGelo < 0 ||
         totalEspeciais > linhas * colunas) {
-        throw std::invalid_argument("A fabrica nao tem posicoes suficientes para os terrenos definidos em Settings.");
+        throw std::string("A fabrica nao tem posicoes suficientes para os terrenos definidos em Settings.");
     }
 
     if (Settings::deposito_quantidade_min > Settings::deposito_quantidade_max) {
-        throw std::invalid_argument("Intervalo de quantidade dos depositos invalido em Settings.");
+        throw std::string("Intervalo de quantidade dos depositos invalido em Settings.");
     }
 
     char mapa[Settings::fabrica_max_linhas][Settings::fabrica_max_colunas]{};
 
-    std::uniform_int_distribution<int> sorteiaLinha(0, linhas - 1);
-    std::uniform_int_distribution<int> sorteiaColuna(0, colunas - 1);
-
-    const auto colocaAleatoriamente = [&](char tipo, int quantidade) {
-        int colocados = 0;
-
-        while (colocados < quantidade) {
-            const int linha = sorteiaLinha(obtemGerador());
-            const int coluna = sorteiaColuna(obtemGerador());
-
-            if (mapa[linha][coluna] == '\0') {
-                mapa[linha][coluna] = tipo;
-                ++colocados;
-            }
-        }
-    };
-
-    colocaAleatoriamente('#', numCrateras);
-    colocaAleatoriamente('%', numFerro);
-    colocaAleatoriamente('$', numSilicio);
-    colocaAleatoriamente('~', numGelo);
+    colocaAleatoriamente(mapa, linhas, colunas, '#', numCrateras);
+    colocaAleatoriamente(mapa, linhas, colunas, '%', numFerro);
+    colocaAleatoriamente(mapa, linhas, colunas, '$', numSilicio);
+    colocaAleatoriamente(mapa, linhas, colunas, '~', numGelo);
 
     std::uniform_int_distribution<int> sorteiaQuantidade(
         Settings::deposito_quantidade_min,
@@ -115,7 +122,7 @@ int Fabrica::obtemCreditos() const {
 
 Posicao& Fabrica::obtemPosicao(int linha, int coluna) {
     if (linha < 0 || linha >= linhas || coluna < 0 || coluna >= colunas) {
-        throw std::out_of_range("Posicao fora dos limites da fabrica.");
+        throw std::string("Posicao fora dos limites da fabrica.");
     }
 
     return *posicoes[linha][coluna];
@@ -123,7 +130,7 @@ Posicao& Fabrica::obtemPosicao(int linha, int coluna) {
 
 const Posicao& Fabrica::obtemPosicao(int linha, int coluna) const {
     if (linha < 0 || linha >= linhas || coluna < 0 || coluna >= colunas) {
-        throw std::out_of_range("Posicao fora dos limites da fabrica.");
+        throw std::string("Posicao fora dos limites da fabrica.");
     }
 
     return *posicoes[linha][coluna];

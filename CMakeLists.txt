@@ -7,4 +7,6 @@ add_executable(TrabalhoPOO main.cpp
         ecra/Ecra.h
         ecra/Ecra.cpp
         terreno/terreno.cpp
-        terreno/terreno.h\n        posicao/Posicao.cpp\n        posicao/Posicao.h)
+        terreno/terreno.h
+        posicao/Posicao.cpp
+        posicao/Posicao.h)

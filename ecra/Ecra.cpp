@@ -13,21 +13,21 @@ Ecra::Ecra(int nLinhas, int nColunas)
         linhasUsadas = 1;
 
     if (linhasUsadas > Settings::ecra_max_linhas)
-        linhasUsadas = MAX_LINHAS;
+        linhasUsadas = Settings::ecra_max_linhas;
 
     if (colunasUsadas < 1)
         colunasUsadas = 1;
 
     if (colunasUsadas > Settings::ecra_max_colunas)
-        colunasUsadas = MAX_COLUNAS;
+        colunasUsadas = Settings::ecra_max_colunas;
 
     limpa();
 }
 
 // Limpar o ecrã
 void Ecra::limpa() {
-    for (int i = 0; i < MAX_LINHAS; ++i) {
-        for (int j = 0; j < MAX_COLUNAS; ++j) {
+    for (int i = 0; i < Settings::ecra_max_linhas; ++i) {
+        for (int j = 0; j < Settings::ecra_max_colunas; ++j) {
             buffer[i][j] = ' ';
         }
     }

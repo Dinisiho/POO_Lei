@@ -116,7 +116,8 @@ int main() {
     }
 
     while (fabrica != nullptr && std::cin) {
-        int alturaEcra = fabrica->obtemLinhas() + 3;
+        // Reserva espaco para o painel inferior quando nao cabe ao lado.
+        int alturaEcra = fabrica->obtemLinhas() + 14;
         if (alturaEcra < 10) alturaEcra = 10;
         Ecra ecra(alturaEcra, Settings::ecra_max_colunas);
         vista.desenha(*fabrica, ecra);

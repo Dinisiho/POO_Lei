@@ -8,7 +8,7 @@ class Posicao;
 
 class Fabrica {
 public:
-    Fabrica(int linhas, int colunas);
+    Fabrica(int nLinhas, int nColunas);
     ~Fabrica();
 
     Fabrica(const Fabrica&) = delete;
@@ -18,7 +18,8 @@ public:
     int obtemColunas() const;
     int obtemCreditos() const;
 
-    Posicao& obtemPosicao(int linha, int coluna) const;
+    Posicao& obtemPosicao(int linha, int coluna);
+    const Posicao& obtemPosicao(int linha, int coluna) const;
 
 private:
     int linhas;

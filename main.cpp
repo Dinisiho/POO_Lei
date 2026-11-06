@@ -83,10 +83,6 @@ int main() {
                               << "Sao necessarias pelo menos " << minimoPosicoes
                               << " posicoes para colocar " << Settings::fabrica_num_crateras
                               << " crateras e " << totalDepositos << " depositos.\n";
-                    if (Settings::fabrica_max_linhas >= 6 &&
-                        Settings::fabrica_max_colunas >= 6 && minimoPosicoes <= 36) {
-                        std::cout << "Sugestao: experimenta 6 linhas e 6 colunas.\n";
-                    }
                     std::cout << "Tenta outras dimensoes ou introduz 0 para voltar.\n";
                     continue;
                 }

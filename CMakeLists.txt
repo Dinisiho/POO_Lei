@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(TrabalhoPOO main.cpp
         ecra/Ecra.h
         ecra/Ecra.cpp
+        fabrica/Fabrica.h
+        fabrica/Fabrica.cpp
         terreno/terreno.cpp
         terreno/terreno.h
         posicao/Posicao.cpp

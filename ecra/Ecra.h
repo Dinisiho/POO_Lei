@@ -2,11 +2,13 @@
 #define ECRA_H
 
 #include <string>
+#include "../settings/Settings.h"
 
 class Ecra {
 public:
     // Construtor com dimensões por omissão
-    Ecra(int nLinhas = MAX_LINHAS, int nColunas = MAX_COLUNAS);
+    Ecra(int nLinhas = Settings::ecra_max_linhas,
+         int nColunas = Settings::ecra_max_colunas);
 
     // Limpa o conteúdo do ecrã
     void limpa();
@@ -33,10 +35,7 @@ public:
     int obtemColunas() const;
 
 private:
-    static const int MAX_LINHAS = 40;
-    static const int MAX_COLUNAS = 80;
-
-    char buffer[MAX_LINHAS][MAX_COLUNAS];
+    char buffer[Settings::ecra_max_linhas][Settings::ecra_max_colunas];
 
     int linhasUsadas;
     int colunasUsadas;

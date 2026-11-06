@@ -4,7 +4,6 @@
 #include "../terreno/terreno.h"
 
 #include <random>
-#include <stdexcept>
 #include <string>
 
 namespace {
@@ -30,7 +29,7 @@ namespace {
             int linha = sorteiaLinha(obtemGerador());
             int coluna = sorteiaColuna(obtemGerador());
 
-            if (mapa[linha][coluna] == '\0') {
+            if (mapa[linha][coluna] == '\\0') {
                 mapa[linha][coluna] = tipo;
                 ++colocados;
             }

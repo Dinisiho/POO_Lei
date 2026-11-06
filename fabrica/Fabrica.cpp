@@ -3,6 +3,7 @@
 #include "../posicao/Posicao.h"
 #include "../terreno/terreno.h"
 
+#include <fstream>
 #include <random>
 #include <string>
 
@@ -29,10 +30,21 @@ namespace {
             int linha = sorteiaLinha(obtemGerador());
             int coluna = sorteiaColuna(obtemGerador());
 
-            if (mapa[linha][coluna] == '\\0') {
+            if (mapa[linha][coluna] == '\0') {
                 mapa[linha][coluna] = tipo;
                 ++colocados;
             }
+        }
+    }
+    void validaIntervaloDepositos() {
+        if (Settings::deposito_quantidade_min > Settings::deposito_quantidade_max) {
+            throw std::string("Intervalo de quantidades invalido em Settings.");
+        }
+    }
+
+    void removeRetornoCarro(std::string& linha) {
+        if (!linha.empty() && linha.back() == '\r') {
+            linha.pop_back();
         }
     }
 }
@@ -42,10 +54,8 @@ Fabrica::Fabrica(int nLinhas, int nColunas)
       colunas(nColunas),
       creditos(Settings::fabrica_creditos_iniciais) {
 
-    if (linhas < 1 || linhas > Settings::fabrica_max_linhas ||
-        colunas < 1 || colunas > Settings::fabrica_max_colunas) {
-        throw std::string("Dimensoes da fabrica invalidas.");
-    }
+    validaDimensoes();
+    validaIntervaloDepositos();
 
     int numCrateras = Settings::fabrica_num_crateras;
     int numFerro = Settings::fabrica_num_depositos_ferro;
@@ -58,10 +68,6 @@ Fabrica::Fabrica(int nLinhas, int nColunas)
         throw std::string("A fabrica nao tem posicoes suficientes para os terrenos definidos em Settings.");
     }
 
-    if (Settings::deposito_quantidade_min > Settings::deposito_quantidade_max) {
-        throw std::string("Intervalo de quantidade dos depositos invalido em Settings.");
-    }
-
     char mapa[Settings::fabrica_max_linhas][Settings::fabrica_max_colunas]{};
 
     colocaAleatoriamente(mapa, linhas, colunas, '#', numCrateras);
@@ -69,6 +75,72 @@ Fabrica::Fabrica(int nLinhas, int nColunas)
     colocaAleatoriamente(mapa, linhas, colunas, '$', numSilicio);
     colocaAleatoriamente(mapa, linhas, colunas, '~', numGelo);
 
+    criaTerrenos(mapa);
+}
+
+
+Fabrica::Fabrica(const std::string& caminhoMapa)
+    : linhas(0), colunas(0),
+      creditos(Settings::fabrica_creditos_iniciais) {
+    validaIntervaloDepositos();
+
+    std::ifstream ficheiro(caminhoMapa);
+    if (!ficheiro) {
+        throw std::string("Nao foi possivel abrir o ficheiro de mapa.");
+    }
+
+    if (!(ficheiro >> linhas >> colunas)) {
+        throw std::string("Dimensoes em falta ou invalidas no mapa.");
+    }
+    validaDimensoes();
+
+    std::string restoCabecalho;
+    std::getline(ficheiro, restoCabecalho);
+    for (char caracter : restoCabecalho) {
+        if (caracter != ' ' && caracter != '\t' && caracter != '\r') {
+            throw std::string("A primeira linha do mapa deve conter apenas duas dimensoes.");
+        }
+    }
+
+    char mapa[Settings::fabrica_max_linhas][Settings::fabrica_max_colunas]{};
+    for (int linha = 0; linha < linhas; ++linha) {
+        std::string texto;
+        if (!std::getline(ficheiro, texto)) {
+            throw std::string("Faltam linhas no mapa.");
+        }
+        removeRetornoCarro(texto);
+        const std::string::size_type comprimentoEsperado = colunas;
+        if (texto.size() != comprimentoEsperado) {
+            throw std::string("Uma linha do mapa nao tem o numero esperado de colunas.");
+        }
+        for (int coluna = 0; coluna < colunas; ++coluna) {
+            const char caracter = texto[coluna];
+            if (caracter != '.' && caracter != '#' && caracter != '%' &&
+                caracter != '$' && caracter != '~') {
+                throw std::string("O mapa contem um caracter de terreno invalido.");
+            }
+            mapa[linha][coluna] = caracter;
+        }
+    }
+
+    std::string linhaExtra;
+    if (std::getline(ficheiro, linhaExtra)) {
+        throw std::string("O mapa contem linhas a mais.");
+    }
+    if (ficheiro.bad()) {
+        throw std::string("Erro durante a leitura do mapa.");
+    }
+    criaTerrenos(mapa);
+}
+
+void Fabrica::validaDimensoes() const {
+    if (linhas < 1 || linhas > Settings::fabrica_max_linhas ||
+        colunas < 1 || colunas > Settings::fabrica_max_colunas) {
+        throw std::string("Dimensoes da fabrica invalidas.");
+    }
+}
+
+void Fabrica::criaTerrenos(const char mapa[][Settings::fabrica_max_colunas]) {
     std::uniform_int_distribution<int> sorteiaQuantidade(
         Settings::deposito_quantidade_min,
         Settings::deposito_quantidade_max

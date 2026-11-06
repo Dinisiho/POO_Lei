@@ -8,7 +8,8 @@ class Posicao {
 public:
     explicit Posicao(Terreno& terreno);
 
-    Terreno& obtemTerreno() const;
+    Terreno& obtemTerreno();
+    const Terreno& obtemTerreno() const;
     Maquina* obtemMaquina() const;
 
     bool podeReceberMaquina() const;

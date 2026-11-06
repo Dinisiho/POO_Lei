@@ -5,7 +5,11 @@ Posicao::Posicao(Terreno& terreno)
     : terreno(&terreno), maquina(nullptr) {
 }
 
-Terreno& Posicao::obtemTerreno() const {
+Terreno& Posicao::obtemTerreno() {
+    return *terreno;
+}
+
+const Terreno& Posicao::obtemTerreno() const {
     return *terreno;
 }
 

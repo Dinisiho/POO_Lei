@@ -14,9 +14,9 @@ namespace {
     }
 }
 
-Fabrica::Fabrica(int linhas, int colunas)
-    : linhas(linhas),
-      colunas(colunas),
+Fabrica::Fabrica(int nLinhas, int nColunas)
+    : linhas(nLinhas),
+      colunas(nColunas),
       creditos(Settings::fabrica_creditos_iniciais) {
 
     if (linhas < 1 || linhas > Settings::fabrica_max_linhas ||
@@ -113,7 +113,15 @@ int Fabrica::obtemCreditos() const {
     return creditos;
 }
 
-Posicao& Fabrica::obtemPosicao(int linha, int coluna) const {
+Posicao& Fabrica::obtemPosicao(int linha, int coluna) {
+    if (linha < 0 || linha >= linhas || coluna < 0 || coluna >= colunas) {
+        throw std::out_of_range("Posicao fora dos limites da fabrica.");
+    }
+
+    return *posicoes[linha][coluna];
+}
+
+const Posicao& Fabrica::obtemPosicao(int linha, int coluna) const {
     if (linha < 0 || linha >= linhas || coluna < 0 || coluna >= colunas) {
         throw std::out_of_range("Posicao fora dos limites da fabrica.");
     }

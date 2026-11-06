@@ -12,30 +12,39 @@ void VistaFabrica::desenha(const Fabrica& fabrica, Ecra& ecra) const {
     const int nLinhas = fabrica.obtemLinhas();
     const int nColunas = fabrica.obtemColunas();
 
-    // Uma linha para a regua e uma coluna para as letras das linhas.
-    ecra.desenhaMoldura(0, 0, nLinhas + 3, nColunas + 4);
+    // Cada posicao ocupa dois caracteres na horizontal.
+    const int larguraPosicao = 2;
+    const int alturaMapa = nLinhas + 3;
+    const int larguraMapa = nColunas * larguraPosicao + 4;
+
+    ecra.desenhaMoldura(0, 0, alturaMapa, larguraMapa);
     for (int coluna = 0; coluna < nColunas; ++coluna) {
-        ecra.escreve(1, coluna + 2, char('A' + coluna));
+        ecra.escreve(1, coluna * larguraPosicao + 2, char('A' + coluna));
     }
     for (int linha = 0; linha < nLinhas; ++linha) {
         ecra.escreve(linha + 2, 1, char('A' + linha));
         for (int coluna = 0; coluna < nColunas; ++coluna) {
             const Terreno& terreno = fabrica.obtemPosicao(linha, coluna).obtemTerreno();
-            ecra.escreve(linha + 2, coluna + 2, terreno.obterChar());
+            ecra.escreve(linha + 2, coluna * larguraPosicao + 2, terreno.obterChar());
         }
     }
 
-    const int painelColuna = nColunas + 6;
-    const int painelLargura = ecra.obtemColunas() - painelColuna;
-    if (painelLargura >= 30) {
-        ecra.desenhaMoldura(0, painelColuna, 10, painelLargura);
-        ecra.escreve(1, painelColuna + 2, "Instante: 0");
-        ecra.escreve(2, painelColuna + 2,
+    // O painel fica ao lado quando cabe; caso contrario, fica por baixo.
+    const int larguraPainel = 30;
+    const int colunaLateral = larguraMapa + 2;
+    const bool painelLateral = colunaLateral + larguraPainel <= ecra.obtemColunas();
+    const int painelLinha = painelLateral ? 0 : alturaMapa + 1;
+    const int painelColuna = painelLateral ? colunaLateral : 0;
+
+    if (painelLinha + 10 <= ecra.obtemLinhas()) {
+        ecra.desenhaMoldura(painelLinha, painelColuna, 10, larguraPainel);
+        ecra.escreve(painelLinha + 1, painelColuna + 2, "Instante: 0");
+        ecra.escreve(painelLinha + 2, painelColuna + 2,
                     "Creditos: " + std::to_string(fabrica.obtemCreditos()));
-        ecra.escreve(3, painelColuna + 2, "Maquinas: 0");
-        ecra.escreve(4, painelColuna + 2, "Engenheiros: 0");
-        ecra.escreve(6, painelColuna + 2, "No ultimo instante:");
-        ecra.escreve(7, painelColuna + 2, "Sem eventos (checkpoint 1)");
+        ecra.escreve(painelLinha + 3, painelColuna + 2, "Maquinas: 0");
+        ecra.escreve(painelLinha + 4, painelColuna + 2, "Engenheiros: 0");
+        ecra.escreve(painelLinha + 6, painelColuna + 2, "No ultimo instante:");
+        ecra.escreve(painelLinha + 7, painelColuna + 2, "Sem eventos (checkpoint 1)");
     }
 }
 

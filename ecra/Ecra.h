@@ -2,56 +2,50 @@
 #define ECRA_H
 
 #include <string>
-using namespace std;
 
 class Ecra {
 public:
-    // Construtor: define as dimensões úteis do ecrã virtual (com valores por omissão para os máximos)
+    // Construtor com dimensões por omissão
     Ecra(int nLinhas = MAX_LINHAS, int nColunas = MAX_COLUNAS);
 
-    // Limpa o buffer interno preenchendo-o com espaços e coloca o cursor na posição (0, 0)
+    // Limpa o conteúdo do ecrã
     void limpa();
 
-    // Posiciona o cursor virtual numa linha e coluna específicas
-    void posiciona(int l, int c);
+    // Posiciona o cursor virtual
+    void posiciona(int linha, int coluna);
 
-    // Sobrecargas de escrita a partir da posição atual do cursor virtual
-    void escreve(char c);
-    void escreve(const string& texto);
+    // Escreve a partir da posição atual do cursor
+    void escreve(char caracter);
+    void escreve(const std::string& texto);
 
-    // Sobrecargas de escrita direta em coordenadas arbitrárias
-    void escreve(int l, int c, char var);
-    void escreve(int l, int c, const string& texto);
+    // Escreve numa posição específica
+    void escreve(int linha, int coluna, char caracter);
+    void escreve(int linha, int coluna, const std::string& texto);
 
-    // Desenha uma moldura retangular com caracteres de canto e linha
-    void desenhaMoldura(int l, int c, int alt, int larg);
+    // Desenha uma moldura retangular
+    void desenhaMoldura(int linha, int coluna, int altura, int largura);
 
-    // Envia todo o conteúdo do buffer para a consola de uma só vez
+    // Apresenta o conteúdo do buffer na consola
     void mostra() const;
 
-    // Métodos de consulta de dimensões
+    // Consulta as dimensões utilizadas
     int obtemLinhas() const;
     int obtemColunas() const;
 
 private:
-    // Constantes físicas máximas do buffer definidas no enunciado
     static const int MAX_LINHAS = 40;
     static const int MAX_COLUNAS = 80;
 
-    // Buffer bidimensional estático (proibido o uso de contentores standard)
-    char buffer[MAX_LINHAS][MAX_COLUNAS]{};
+    char buffer[MAX_LINHAS][MAX_COLUNAS];
 
-    // Dimensões ativas em uso na simulação
     int linhasUsadas;
     int colunasUsadas;
 
-    // Posição atual do cursor virtual
-    int cursorLin;
-    int cursorCol;
+    int cursorLinha;
+    int cursorColuna;
 
-    // Função membro auxiliar privada para validação de limites
-    bool posicaoValida(int l, int c) const;
+    // Verifica se uma posição está dentro dos limites
+    bool posicaoValida(int linha, int coluna) const;
 };
 
-#endif // ECRA_H
-
+#endif

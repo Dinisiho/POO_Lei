@@ -1,113 +1,158 @@
 #include "Ecra.h"
 #include <iostream>
 
-using namespace std;
-
+// Construtor
 Ecra::Ecra(int nLinhas, int nColunas)
-    : linhasUsadas(nLinhas), colunasUsadas(nColunas), cursorLin(0), cursorCol(0) {
-    // Garante que as dimensões úteis nunca ultrapassam os máximos físicos permitidos
-    if (linhasUsadas < 1) linhasUsadas = 1;
-    if (linhasUsadas > MAX_LINHAS) linhasUsadas = MAX_LINHAS;
+    : linhasUsadas(nLinhas),
+      colunasUsadas(nColunas),
+      cursorLinha(0),
+      cursorColuna(0) {
+    // Garantir que as dimensões respeitam os limites do buffer
+    if (linhasUsadas < 1)
+        linhasUsadas = 1;
 
-    if (colunasUsadas < 1) colunasUsadas = 1;
-    if (colunasUsadas > MAX_COLUNAS) colunasUsadas = MAX_COLUNAS;
+    if (linhasUsadas > MAX_LINHAS)
+        linhasUsadas = MAX_LINHAS;
+
+    if (colunasUsadas < 1)
+        colunasUsadas = 1;
+
+    if (colunasUsadas > MAX_COLUNAS)
+        colunasUsadas = MAX_COLUNAS;
 
     limpa();
 }
 
+// Limpar o ecrã
 void Ecra::limpa() {
-    for (int i = 0; i < linhasUsadas; ++i) {
-        for (int j = 0; j < colunasUsadas; ++j) {
+    for (int i = 0; i < MAX_LINHAS; ++i) {
+        for (int j = 0; j < MAX_COLUNAS; ++j) {
             buffer[i][j] = ' ';
         }
     }
-    cursorLin = 0;
-    cursorCol = 0;
+
+    cursorLinha = 0;
+    cursorColuna = 0;
 }
 
-void Ecra::posiciona(int l, int c) {
-    if (posicaoValida(l, c)) {
-        cursorLin = l;
-        cursorCol = c;
-    }
+// Posicionar o cursor
+void Ecra::posiciona(int linha, int coluna) {
+    cursorLinha = linha;
+    cursorColuna = coluna;
 }
 
-void Ecra::escreve(char c) {
-    // Se o cursor estiver fora dos limites úteis, a escrita é ignorada silenciosamente
-    if (!posicaoValida(cursorLin, cursorCol)) {
+// Escrever um caracter na posição atual
+void Ecra::escreve(char caracter) {
+    if (!posicaoValida(cursorLinha, cursorColuna))
         return;
-    }
 
-    buffer[cursorLin][cursorCol] = c;
-    cursorCol++;
+    buffer[cursorLinha][cursorColuna] = caracter;
 
-    // Se atingir o fim da linha útil, salta para a linha seguinte
-    if (cursorCol >= colunasUsadas) {
-        cursorCol = 0;
-        cursorLin++;
+    ++cursorColuna;
+
+    // Passar para a linha seguinte quando chegar ao fim
+    // da linha atual
+    if (cursorColuna >= colunasUsadas) {
+        cursorColuna = 0;
+        ++cursorLinha;
     }
 }
 
-void Ecra::escreve(const string& texto) {
-    for (char c : texto) {
-        if (c == '\n') {
-            cursorCol = 0;
-            cursorLin++;
+// Escrever uma string na posição atual
+void Ecra::escreve(const std::string& texto) {
+    for (char caracter : texto) {
+        // Tratar a mudança de linha
+        if (caracter == '\n') {
+            cursorColuna = 0;
+            ++cursorLinha;
         } else {
-            escreve(c);
+            escreve(caracter);
         }
     }
 }
 
-void Ecra::escreve(int l, int c, char car) {
-    posiciona(l, c);
-    escreve(car);
+// Escrever um caracter numa posição específica
+void Ecra::escreve(int linha, int coluna, char caracter) {
+    if (!posicaoValida(linha, coluna))
+        return;
+
+    posiciona(linha, coluna);
+    escreve(caracter);
 }
 
-void Ecra::escreve(int l, int c, const string& texto) {
-    posiciona(l, c);
+// Escrever uma string numa posição específica
+void Ecra::escreve(int linha, int coluna, const std::string& texto) {
+    if (!posicaoValida(linha, coluna))
+        return;
+
+    posiciona(linha, coluna);
     escreve(texto);
 }
 
-void Ecra::desenhaMoldura(int l, int c, int alt, int larg) {
-    if (alt <= 0 || larg <= 0) return;
+// Desenhar uma moldura retangular
+void Ecra::desenhaMoldura(int linha, int coluna, int altura, int largura) {
+    if (altura <= 0 || largura <= 0)
+        return;
 
-    // Cantos
-    escreve(l, c, '+');
-    escreve(l, c + larg - 1, '+');
-    escreve(l + alt - 1, c, '+');
-    escreve(l + alt - 1, c + larg - 1, '+');
+    const int ultimaLinha = linha + altura - 1;
+    const int ultimaColuna = coluna + largura - 1;
 
-    // Linhas horizontais (superior e inferior)
-    for (int j = c + 1; j < c + larg - 1; ++j) {
-        escreve(l, j, '-');
-        escreve(l + alt - 1, j, '-');
+    // Desenhar as linhas horizontais
+    for (int j = 0; j < colunasUsadas; ++j) {
+        if (linha >= 0 && linha < linhasUsadas &&
+            j >= coluna && j <= ultimaColuna) {
+            if (j == coluna || j == ultimaColuna)
+                buffer[linha][j] = '+';
+            else
+                buffer[linha][j] = '-';
+        }
+
+        if (ultimaLinha >= 0 && ultimaLinha < linhasUsadas &&
+            j >= coluna && j <= ultimaColuna) {
+            if (j == coluna || j == ultimaColuna)
+                buffer[ultimaLinha][j] = '+';
+            else
+                buffer[ultimaLinha][j] = '-';
+        }
     }
 
-    // Linhas verticais (esquerda e direita)
-    for (int i = l + 1; i < l + alt - 1; ++i) {
-        escreve(i, c, '|');
-        escreve(i, c + larg - 1, '|');
+    // Desenhar as linhas verticais
+    for (int i = 0; i < linhasUsadas; ++i) {
+        if (i > linha && i < ultimaLinha) {
+            if (coluna >= 0 && coluna < colunasUsadas)
+                buffer[i][coluna] = '|';
+
+            if (ultimaColuna >= 0 && ultimaColuna < colunasUsadas)
+                buffer[i][ultimaColuna] = '|';
+        }
     }
 }
 
+// Apresentar o conteúdo do buffer
 void Ecra::mostra() const {
     for (int i = 0; i < linhasUsadas; ++i) {
         for (int j = 0; j < colunasUsadas; ++j) {
-            cout << buffer[i][j];
+            std::cout << buffer[i][j];
         }
-        cout << '\n';
+
+        std::cout << '\n';
     }
 }
 
+// Obter o número de linhas utilizadas
 int Ecra::obtemLinhas() const {
     return linhasUsadas;
 }
 
+// Obter o número de colunas utilizadas
 int Ecra::obtemColunas() const {
     return colunasUsadas;
 }
 
-bool Ecra::posicaoValida(int l, int c) const {
-    return (l >= 0 && l < linhasUsadas && c >= 0 && c < colunasUsadas);
+// Verificar se uma posição está dentro dos limites
+bool Ecra::posicaoValida(int linha, int coluna) const {
+    return linha >= 0 &&
+        linha < linhasUsadas &&
+        coluna >= 0 &&
+        coluna < colunasUsadas;
 }

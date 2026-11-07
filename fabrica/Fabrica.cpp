@@ -5,6 +5,7 @@
 
 #include <fstream>
 #include <random>
+#include <sstream>
 #include <string>
 
 namespace {
@@ -89,18 +90,19 @@ Fabrica::Fabrica(const std::string& caminhoMapa)
         throw std::string("Nao foi possivel abrir o ficheiro de mapa.");
     }
 
-    if (!(ficheiro >> linhas >> colunas)) {
-        throw std::string("Dimensoes em falta ou invalidas no mapa.");
+    std::string cabecalho;
+    if (!std::getline(ficheiro, cabecalho)) {
+        throw std::string("Falta a primeira linha do mapa.");
+    }
+    removeRetornoCarro(cabecalho);
+
+    std::istringstream entradaCabecalho(cabecalho);
+    std::string textoExtra;
+    if (!(entradaCabecalho >> linhas >> colunas) ||
+        (entradaCabecalho >> textoExtra)) {
+        throw std::string("A primeira linha do mapa deve conter apenas duas dimensoes inteiras.");
     }
     validaDimensoes();
-
-    std::string restoCabecalho;
-    std::getline(ficheiro, restoCabecalho);
-    for (char caracter : restoCabecalho) {
-        if (caracter != ' ' && caracter != '\t' && caracter != '\r') {
-            throw std::string("A primeira linha do mapa deve conter apenas duas dimensoes.");
-        }
-    }
 
     char mapa[Settings::fabrica_max_linhas][Settings::fabrica_max_colunas]{};
     for (int linha = 0; linha < linhas; ++linha) {

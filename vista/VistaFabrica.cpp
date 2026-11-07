@@ -12,31 +12,27 @@ void VistaFabrica::desenha(const Fabrica& fabrica, Ecra& ecra) const {
     const int nLinhas = fabrica.obtemLinhas();
     const int nColunas = fabrica.obtemColunas();
 
-    // Cada posicao ocupa dois caracteres na horizontal.
-    const int larguraPosicao = 2;
     const int alturaMapa = nLinhas + 3;
-    const int larguraMapa = nColunas * larguraPosicao + 4;
+    const int larguraMapa = nColunas + 4;
 
     ecra.desenhaMoldura(0, 0, alturaMapa, larguraMapa);
     for (int coluna = 0; coluna < nColunas; ++coluna) {
-        ecra.escreve(1, coluna * larguraPosicao + 2, char('A' + coluna));
+        ecra.escreve(1, coluna + 2, char('A' + coluna));
     }
     for (int linha = 0; linha < nLinhas; ++linha) {
         ecra.escreve(linha + 2, 1, char('A' + linha));
         for (int coluna = 0; coluna < nColunas; ++coluna) {
             const Terreno& terreno = fabrica.obtemPosicao(linha, coluna).obtemTerreno();
-            ecra.escreve(linha + 2, coluna * larguraPosicao + 2, terreno.obterChar());
+            ecra.escreve(linha + 2, coluna + 2, terreno.obterChar());
         }
     }
 
-    // O painel fica ao lado quando cabe; caso contrario, fica por baixo.
     const int larguraPainel = 30;
-    const int colunaLateral = larguraMapa + 2;
-    const bool painelLateral = colunaLateral + larguraPainel <= ecra.obtemColunas();
-    const int painelLinha = painelLateral ? 0 : alturaMapa + 1;
-    const int painelColuna = painelLateral ? colunaLateral : 0;
+    const int painelLinha = 0;
+    const int painelColuna = larguraMapa + 2;
 
-    if (painelLinha + 10 <= ecra.obtemLinhas()) {
+    if (painelLinha + 10 <= ecra.obtemLinhas() &&
+        painelColuna + larguraPainel <= ecra.obtemColunas()) {
         ecra.desenhaMoldura(painelLinha, painelColuna, 10, larguraPainel);
         ecra.escreve(painelLinha + 1, painelColuna + 2, "Instante: 0");
         ecra.escreve(painelLinha + 2, painelColuna + 2,

@@ -64,7 +64,9 @@ void Ecra::escreve(const std::string& texto) {
         // Tratar a mudança de linha
         if (caracter == '\n') {
             cursorColuna = 0;
-            ++cursorLinha;
+            if (cursorLinha < linhasUsadas) {
+                ++cursorLinha;
+            }
         } else {
             escreve(caracter);
         }

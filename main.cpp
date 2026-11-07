@@ -3,10 +3,24 @@
 #include "vista/VistaFabrica.h"
 
 #include <iostream>
+#include <sstream>
 #include <string>
 
 // Interface provisoria de demonstracao das funcionalidades do checkpoint 1.
 // O processamento completo dos comandos pertence ao checkpoint 2.
+namespace {
+    bool leInteiro(int& valor) {
+        std::string texto;
+        if (!std::getline(std::cin, texto)) {
+            return false;
+        }
+
+        std::istringstream entrada(texto);
+        std::string textoExtra;
+        return (entrada >> valor) && !(entrada >> textoExtra);
+    }
+}
+
 int main() {
     VistaFabrica vista;
     Fabrica* fabrica = nullptr;
@@ -17,14 +31,11 @@ int main() {
                      "2 - Carregar fabrica de um ficheiro\n"
                      "0 - Terminar\nOpcao: ";
         int opcao = -1;
-        if (!(std::cin >> opcao)) {
-            if (std::cin.eof()) break;
-            std::cin.clear();
-            std::cin.ignore(10000, '\n');
+        if (!leInteiro(opcao)) {
+            if (!std::cin) break;
             std::cout << "Opcao invalida. Introduz 0, 1 ou 2.\n";
             continue;
         }
-        std::cin.ignore(10000, '\n');
 
         if (opcao == 1) {
             const int totalDepositos = Settings::fabrica_num_depositos_ferro +
@@ -45,27 +56,19 @@ int main() {
                 int colunas = 0;
 
                 std::cout << "\nLinhas: ";
-                if (!(std::cin >> linhas)) {
-                    if (std::cin.eof()) break;
-                    std::cin.clear();
-                    std::cin.ignore(10000, '\n');
+                if (!leInteiro(linhas)) {
+                    if (!std::cin) break;
                     std::cout << "Erro: introduz um numero inteiro de linhas.\n";
                     continue;
                 }
-                if (linhas == 0) {
-                    std::cin.ignore(10000, '\n');
-                    break;
-                }
+                if (linhas == 0) break;
 
                 std::cout << "Colunas: ";
-                if (!(std::cin >> colunas)) {
-                    if (std::cin.eof()) break;
-                    std::cin.clear();
-                    std::cin.ignore(10000, '\n');
+                if (!leInteiro(colunas)) {
+                    if (!std::cin) break;
                     std::cout << "Erro: introduz um numero inteiro de colunas.\n";
                     continue;
                 }
-                std::cin.ignore(10000, '\n');
                 if (colunas == 0) break;
 
                 if (linhas < 1 || linhas > Settings::fabrica_max_linhas ||
@@ -126,14 +129,11 @@ int main() {
         std::cout << "\n1 - Consultar terreno / regiao\n"
                      "0 - Terminar\nOpcao: ";
         int opcao = -1;
-        if (!(std::cin >> opcao)) {
-            if (std::cin.eof()) break;
-            std::cin.clear();
-            std::cin.ignore(10000, '\n');
+        if (!leInteiro(opcao)) {
+            if (!std::cin) break;
             std::cout << "Opcao invalida. Introduz 0 ou 1.\n";
             continue;
         }
-        std::cin.ignore(10000, '\n');
         if (opcao == 0) break;
         if (opcao != 1) {
             std::cout << "Opcao invalida.\n";
@@ -143,21 +143,18 @@ int main() {
         std::string codigo;
         int raio = 0;
         std::cout << "Posicao (duas letras, ex. ab): ";
-        if (!(std::cin >> codigo)) break;
-        std::cin.ignore(10000, '\n');
+        if (!std::getline(std::cin, codigo)) break;
         if (codigo.size() != 2 || codigo[0] < 'a' || codigo[0] > 'z' ||
             codigo[1] < 'a' || codigo[1] > 'z') {
             std::cout << "Posicao invalida.\n";
             continue;
         }
         std::cout << "Raio (0 para uma posicao): ";
-        if (!(std::cin >> raio)) {
+        if (!leInteiro(raio)) {
+            if (!std::cin) break;
             std::cout << "Raio invalido.\n";
-            std::cin.clear();
-            std::cin.ignore(10000, '\n');
             continue;
         }
-        std::cin.ignore(10000, '\n');
         vista.consultaTerrenos(*fabrica, codigo[0] - 'a', codigo[1] - 'a',
                               raio, std::cout);
     }

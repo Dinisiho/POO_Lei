@@ -5,7 +5,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_executable(TrabalhoPOO main.cpp
+add_executable(TrabalhoPOO
+        main.cpp
         ecra/Ecra.h
         ecra/Ecra.cpp
         fabrica/Fabrica.h
@@ -16,4 +17,14 @@ add_executable(TrabalhoPOO main.cpp
         posicao/Posicao.h
         vista/VistaFabrica.h
         vista/VistaFabrica.cpp
-        settings/Settings.h)
+        settings/Settings.h
+        comandos/Comando.h
+        comandos/Comando.cpp
+        comandos/Interpretador.h
+        comandos/Interpretador.cpp
+        comandos/ComandosGerais.h
+        comandos/ComandosGerais.cpp
+        comandos/ComandosFabrica.h
+        comandos/ComandosFabrica.cpp
+        comandos/ComandosPendentes.h
+        comandos/ComandosPendentes.cpp)

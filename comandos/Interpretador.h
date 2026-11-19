@@ -1,6 +1,8 @@
 #ifndef INTERPRETADOR_H
 #define INTERPRETADOR_H
 
+#include <cstddef>
+#include <fstream>
 #include <iosfwd>
 #include <string>
 #include <vector>
@@ -20,18 +22,24 @@ public:
     void executaFicheiro(const std::string& caminho, std::ostream& saida);
     void mostraAjuda(const std::string& nome, std::ostream& saida) const;
 
-    bool temFabrica() const;
+    Fabrica& obtemFabrica();
     void criaFabrica(int linhas, int colunas, std::ostream& saida);
     void carregaFabrica(const std::string& caminho, std::ostream& saida);
     void consultaPosicoes(int linha, int coluna, int raio, std::ostream& saida) const;
-    void mostraFabrica() const;
+    void mostraFabrica(std::ostream& saida) const;
 
     void termina();
     bool terminou() const;
 
 private:
+    struct FicheiroComandos {
+        std::string caminho;
+        std::ifstream entrada;
+        std::size_t numeroLinha = 0;
+    };
+
     std::vector<Comando*> comandos;
-    std::vector<std::string> ficheirosEmExecucao;
+    std::vector<FicheiroComandos> ficheirosEmExecucao;
     Fabrica* fabrica;
     bool terminar;
 

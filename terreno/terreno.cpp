@@ -1,5 +1,10 @@
 #include "terreno.h"
 
+bool Terreno::permiteMaquina() const { return true; }
+Item Terreno::extrai() { return {}; }
+bool Terreno::esgotado() const { return false; }
+bool Cratera::permiteMaquina() const { return false; }
+
 char Solo::obterChar() const {
     return ' ';
 }
@@ -27,6 +32,21 @@ std::string Cratera::descricao() const {
 int Deposito::obtemQuantidade() const {
     return qRestante;
 }
+
+Item Deposito::extrai() {
+    if (esgotado()) return {};
+    Item::Tipo tipo;
+    switch (tipoRecurso) {
+        case '%': tipo = Item::Tipo::Ferro; break;
+        case '$': tipo = Item::Tipo::Silicio; break;
+        case '~': tipo = Item::Tipo::Gelo; break;
+        default: return {};
+    }
+    --qRestante;
+    return Item(tipo);
+}
+
+bool Deposito::esgotado() const { return qRestante <= 0; }
 
 std::string Deposito::descricao() const {
     std::string recurso;

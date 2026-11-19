@@ -27,4 +27,14 @@ add_executable(TrabalhoPOO
         comandos/ComandosFabrica.h
         comandos/ComandosFabrica.cpp
         comandos/ComandosPendentes.h
-        comandos/ComandosPendentes.cpp)
+        comandos/ComandosPendentes.cpp
+        comandos/ComandosSimulacao.h
+        comandos/ComandosSimulacao.cpp
+        itens/Item.h
+        itens/Item.cpp
+        maquinas/Maquina.h
+        maquinas/Maquina.cpp
+        maquinas/TiposMaquina.h
+        maquinas/TiposMaquina.cpp
+        maquinas/Silo.h
+        maquinas/Silo.cpp)

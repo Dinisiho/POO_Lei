@@ -4,14 +4,16 @@
 #include "ComandosFabrica.h"
 #include "ComandosGerais.h"
 #include "ComandosPendentes.h"
+#include "ComandosSimulacao.h"
 #include "../ecra/Ecra.h"
 #include "../fabrica/Fabrica.h"
 #include "../settings/Settings.h"
 #include "../vista/VistaFabrica.h"
 
-#include <fstream>
+#include <filesystem>
 #include <ostream>
 #include <sstream>
+#include <utility>
 
 Interpretador::Interpretador() : fabrica(nullptr), terminar(false) {
     // O interpretador e proprietario das instancias dos comandos.
@@ -74,35 +76,48 @@ void Interpretador::processaLinha(const std::string& linha, std::ostream& saida)
     std::string argumentos;
     std::getline(entrada, argumentos);
     if (!comando->valida(argumentos, saida)) return;
+    if (comando->exigeFabrica() && fabrica == nullptr) {
+        saida << "Erro: cria primeiro uma fabrica (fabrica ou carrega).\n";
+        return;
+    }
     comando->executa(*this, argumentos, saida);
 }
 
 void Interpretador::executaFicheiro(const std::string& caminho, std::ostream& saida) {
-    for (const std::string& ativo : ficheirosEmExecucao) {
-        if (ativo == caminho) {
+    for (const FicheiroComandos& ativo : ficheirosEmExecucao) {
+        std::error_code erro;
+        if (ativo.caminho == caminho || std::filesystem::equivalent(ativo.caminho, caminho, erro)) {
             saida << "Erro: execucao recursiva do mesmo ficheiro: " << caminho << "\n";
             return;
         }
     }
 
-    std::ifstream ficheiro(caminho);
-    if (!ficheiro) {
+    FicheiroComandos novo{caminho, std::ifstream(caminho)};
+    if (!novo.entrada) {
         saida << "Erro: nao foi possivel abrir o ficheiro '" << caminho << "'.\n";
         return;
     }
 
-    ficheirosEmExecucao.push_back(caminho);
+    const bool iniciaLeitura = ficheirosEmExecucao.empty();
+    ficheirosEmExecucao.push_back(std::move(novo));
+    if (!iniciaLeitura) return;
+
     std::string linha;
-    int numeroLinha = 0;
-    while (!terminar && std::getline(ficheiro, linha)) {
-        ++numeroLinha;
-        saida << "[" << caminho << ":" << numeroLinha << "] " << linha << '\n';
-        processaLinha(linha, saida);
+    while (!terminar && !ficheirosEmExecucao.empty()) {
+        FicheiroComandos& ativo = ficheirosEmExecucao.back();
+        if (std::getline(ativo.entrada, linha)) {
+            ++ativo.numeroLinha;
+            saida << "[" << ativo.caminho << ":" << ativo.numeroLinha << "] " << linha << '\n';
+            // Um executa aninhado pode realocar o vector. Não se volta a usar ativo.
+            processaLinha(linha, saida);
+        } else {
+            if (ativo.entrada.bad()) {
+                saida << "Erro: falha de leitura no ficheiro '" << ativo.caminho << "'.\n";
+            }
+            ficheirosEmExecucao.pop_back();
+        }
     }
-    if (ficheiro.bad()) {
-        saida << "Erro: falha de leitura no ficheiro '" << caminho << "'.\n";
-    }
-    ficheirosEmExecucao.pop_back();
+    ficheirosEmExecucao.clear();
 }
 
 void Interpretador::mostraAjuda(const std::string& nomeComando, std::ostream& saida) const {
@@ -127,9 +142,7 @@ void Interpretador::mostraAjuda(const std::string& nomeComando, std::ostream& sa
     comando->ajuda(saida);
 }
 
-bool Interpretador::temFabrica() const {
-    return fabrica != nullptr;
-}
+Fabrica& Interpretador::obtemFabrica() { return *fabrica; }
 
 void Interpretador::criaFabrica(int linhas, int colunas, std::ostream& saida) {
     if (fabrica != nullptr) {
@@ -139,7 +152,7 @@ void Interpretador::criaFabrica(int linhas, int colunas, std::ostream& saida) {
     try {
         fabrica = new Fabrica(linhas, colunas);
         saida << "Fabrica criada: " << linhas << " x " << colunas << ".\n";
-        mostraFabrica();
+        mostraFabrica(saida);
     } catch (const std::string& erro) {
         saida << "Erro ao criar fabrica: " << erro << '\n';
     }
@@ -153,7 +166,7 @@ void Interpretador::carregaFabrica(const std::string& caminho, std::ostream& sai
     try {
         fabrica = new Fabrica(caminho);
         saida << "Fabrica carregada de '" << caminho << "'.\n";
-        mostraFabrica();
+        mostraFabrica(saida);
     } catch (const std::string& erro) {
         saida << "Erro ao carregar fabrica: " << erro << '\n';
     }
@@ -161,20 +174,18 @@ void Interpretador::carregaFabrica(const std::string& caminho, std::ostream& sai
 
 void Interpretador::consultaPosicoes(int linha, int coluna, int raio,
                                    std::ostream& saida) const {
-    if (fabrica == nullptr) {
-        saida << "Erro: cria primeiro uma fabrica.\n";
-        return;
-    }
     VistaFabrica vista;
-    vista.consultaTerrenos(*fabrica, linha, coluna, raio, saida);
+    vista.consultaPosicoes(*fabrica, linha, coluna, raio, saida);
 }
 
-void Interpretador::mostraFabrica() const {
+void Interpretador::mostraFabrica(std::ostream& saida) const {
     if (fabrica == nullptr) return;
-    Ecra ecra(fabrica->obtemLinhas() + 14, Settings::ecra_max_colunas);
+    const int alturaMapa = fabrica->obtemLinhas() + 3;
+    const int altura = alturaMapa > VistaFabrica::alturaPainel ? alturaMapa : VistaFabrica::alturaPainel;
+    Ecra ecra(altura, Settings::ecra_max_colunas);
     VistaFabrica vista;
     vista.desenha(*fabrica, ecra);
-    ecra.mostra();
+    ecra.mostra(saida);
 }
 
 void Interpretador::termina() { terminar = true; }

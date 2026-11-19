@@ -1,6 +1,7 @@
 #ifndef ECRA_H
 #define ECRA_H
 
+#include <iosfwd>
 #include <string>
 #include "../settings/Settings.h"
 
@@ -28,7 +29,7 @@ public:
     void desenhaMoldura(int linha, int coluna, int altura, int largura);
 
     // Apresenta o conteúdo do buffer na consola
-    void mostra() const;
+    void mostra(std::ostream& saida) const;
 
     // Consulta as dimensões utilizadas
     int obtemLinhas() const;

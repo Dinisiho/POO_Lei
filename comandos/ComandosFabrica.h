@@ -5,6 +5,7 @@
 
 class ComandoFabrica : public Comando {
 public:
+    bool exigeFabrica() const override { return false; }
     const std::string& nome() const override;
     bool valida(const std::string& argumentos, std::ostream& erros) const override;
     void executa(Interpretador& interpretador, const std::string& argumentos,
@@ -14,6 +15,7 @@ public:
 
 class ComandoCarrega : public Comando {
 public:
+    bool exigeFabrica() const override { return false; }
     const std::string& nome() const override;
     bool valida(const std::string& argumentos, std::ostream& erros) const override;
     void executa(Interpretador& interpretador, const std::string& argumentos,

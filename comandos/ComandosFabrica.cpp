@@ -90,8 +90,8 @@ void ComandoLPosicao::executa(Interpretador& interpretador, const std::string& a
 void ComandoLPosicao::ajuda(std::ostream& saida) const {
     saida << "lposicao <lc> [n]\n"
           << "  lc: duas letras minusculas (linha e coluna); n: raio inteiro nao negativo.\n"
-          << "  Consulta o terreno dessa posicao e, opcionalmente, as vizinhas.\n"
-          << "  Nesta etapa, apresenta apenas terrenos; informacao de maquinas fica pendente.\n"
+          << "  Mostra terreno, quantidade do deposito e detalhes da maquina, incluindo os itens.\n"
+          << "  Com raio, lista o quadrado centrado em lc ate aos limites do mapa.\n"
           << "  Falha sem fabrica, com posicao fora da grelha ou parametros invalidos.\n"
           << "  Exemplo: lposicao df 2\n";
 }

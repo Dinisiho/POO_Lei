@@ -17,6 +17,7 @@ public:
     virtual void executa(Interpretador& interpretador, const std::string& argumentos,
                         std::ostream& saida) const = 0;
     virtual void ajuda(std::ostream& saida) const = 0;
+    virtual bool exigeFabrica() const { return true; }
 
 protected:
     static std::vector<std::string> separa(const std::string& argumentos);

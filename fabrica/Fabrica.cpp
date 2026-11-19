@@ -1,5 +1,6 @@
 #include "Fabrica.h"
 
+#include "../maquinas/Maquina.h"
 #include "../posicao/Posicao.h"
 #include "../terreno/terreno.h"
 
@@ -38,7 +39,8 @@ namespace {
         }
     }
     void validaIntervaloDepositos() {
-        if (Settings::deposito_quantidade_min > Settings::deposito_quantidade_max) {
+        if (Settings::deposito_quantidade_min < 0 ||
+            Settings::deposito_quantidade_min > Settings::deposito_quantidade_max) {
             throw std::string("Intervalo de quantidades invalido em Settings.");
         }
     }
@@ -62,7 +64,7 @@ Fabrica::Fabrica(int nLinhas, int nColunas)
     int numFerro = Settings::fabrica_num_depositos_ferro;
     int numSilicio = Settings::fabrica_num_depositos_silicio;
     int numGelo = Settings::fabrica_num_depositos_gelo;
-    int totalEspeciais = numCrateras + numFerro + numSilicio + numGelo;
+    long long totalEspeciais = static_cast<long long>(numCrateras) + numFerro + numSilicio + numGelo;
 
     if (numCrateras < 0 || numFerro < 0 || numSilicio < 0 || numGelo < 0 ||
         totalEspeciais > linhas * colunas) {
@@ -97,8 +99,13 @@ Fabrica::Fabrica(const std::string& caminhoMapa)
     removeRetornoCarro(cabecalho);
 
     std::istringstream entradaCabecalho(cabecalho);
+    std::string textoLinhas, textoColunas;
     std::string textoExtra;
-    if (!(entradaCabecalho >> linhas >> colunas) ||
+    entradaCabecalho >> textoLinhas >> textoColunas;
+    std::istringstream entradaLinhas(textoLinhas), entradaColunas(textoColunas);
+    char resto;
+    if (!(entradaLinhas >> linhas) || (entradaLinhas >> resto) ||
+        !(entradaColunas >> colunas) || (entradaColunas >> resto) ||
         (entradaCabecalho >> textoExtra)) {
         throw std::string("A primeira linha do mapa deve conter apenas duas dimensoes inteiras.");
     }
@@ -151,24 +158,10 @@ void Fabrica::criaTerrenos(const char mapa[][Settings::fabrica_max_colunas]) {
     try {
         for (int linha = 0; linha < linhas; ++linha) {
             for (int coluna = 0; coluna < colunas; ++coluna) {
-                switch (mapa[linha][coluna]) {
-                    case '#':
-                        terrenos[linha][coluna] = new Cratera();
-                        break;
-                    case '%':
-                    case '$':
-                    case '~':
-                        terrenos[linha][coluna] = new Deposito(
-                            mapa[linha][coluna],
-                            sorteiaQuantidade(obtemGerador())
-                        );
-                        break;
-                    default:
-                        terrenos[linha][coluna] = new Solo();
-                        break;
-                }
-
-                posicoes[linha][coluna] = new Posicao(*terrenos[linha][coluna]);
+                const char tipo = mapa[linha][coluna];
+                const bool deposito = tipo == '%' || tipo == '$' || tipo == '~';
+                const int quantidade = deposito ? sorteiaQuantidade(obtemGerador()) : 0;
+                posicoes[linha][coluna] = new Posicao(tipo, quantidade);
             }
         }
     } catch (...) {
@@ -189,12 +182,20 @@ int Fabrica::obtemColunas() const {
     return colunas;
 }
 
-int Fabrica::obtemCreditos() const {
+long long Fabrica::obtemCreditos() const {
     return creditos;
 }
 
+long long Fabrica::obtemInstante() const { return instante; }
+int Fabrica::obtemNumeroMaquinas() const { return numeroMaquinas; }
+const std::vector<std::string>& Fabrica::obtemEventos() const { return eventos; }
+
+bool Fabrica::contem(int linha, int coluna) const {
+    return linha >= 0 && linha < linhas && coluna >= 0 && coluna < colunas;
+}
+
 Posicao& Fabrica::obtemPosicao(int linha, int coluna) {
-    if (linha < 0 || linha >= linhas || coluna < 0 || coluna >= colunas) {
+    if (!contem(linha, coluna)) {
         throw std::string("Posicao fora dos limites da fabrica.");
     }
 
@@ -202,11 +203,101 @@ Posicao& Fabrica::obtemPosicao(int linha, int coluna) {
 }
 
 const Posicao& Fabrica::obtemPosicao(int linha, int coluna) const {
-    if (linha < 0 || linha >= linhas || coluna < 0 || coluna >= colunas) {
+    if (!contem(linha, coluna)) {
         throw std::string("Posicao fora dos limites da fabrica.");
     }
 
     return *posicoes[linha][coluna];
+}
+
+const char* Fabrica::compra(char tipo, int linha, int coluna, char direcao) {
+    if (!contem(linha, coluna)) return "Posicao fora da fabrica.";
+    Posicao& posicao = obtemPosicao(linha, coluna);
+    if (posicao.obtemMaquina() != nullptr) return "A posicao ja tem uma maquina.";
+    if (!posicao.obtemTerreno().permiteMaquina()) return "Nao se pode comprar numa cratera.";
+    Maquina* maquina = Maquina::cria(tipo, direcao);
+    if (maquina == nullptr) return "Tipo de maquina ou direcao invalida.";
+    if (creditos < maquina->obtemCusto()) {
+        delete maquina;
+        return "Creditos insuficientes.";
+    }
+    creditos -= maquina->obtemCusto();
+    posicao.instalaMaquina(maquina);
+    ++numeroMaquinas;
+    return nullptr;
+}
+
+const char* Fabrica::vende(int linha, int coluna) {
+    if (!contem(linha, coluna)) return "Posicao fora da fabrica.";
+    Posicao& posicao = obtemPosicao(linha, coluna);
+    const Maquina* maquina = posicao.obtemMaquina();
+    if (maquina == nullptr) return "A posicao nao tem maquina.";
+    creditos += static_cast<long long>(maquina->obtemCusto()) *
+                Settings::maquina_percentagem_venda / 100;
+    posicao.removeMaquina();
+    --numeroMaquinas;
+    return nullptr;
+}
+
+const char* Fabrica::roda(int linha, int coluna, char direcao) {
+    if (!contem(linha, coluna)) return "Posicao fora da fabrica.";
+    if (!Maquina::direcaoValida(direcao)) return "Direcao invalida.";
+    Maquina* maquina = obtemPosicao(linha, coluna).obtemMaquina();
+    if (maquina == nullptr) return "A posicao nao tem maquina.";
+    maquina->roda(direcao);
+    return nullptr;
+}
+
+void Fabrica::registaEvento(int linha, int coluna, const std::string& descricao) {
+    const std::string posicao{char('a' + linha), char('a' + coluna)};
+    eventos.push_back(posicao + ": " + descricao);
+}
+
+void Fabrica::avanca() {
+    ++instante;
+    eventos.clear();
+
+    // Todas as máquinas fazem primeiro o trabalho local.
+    for (int linha = 0; linha < linhas; ++linha) {
+        for (int coluna = 0; coluna < colunas; ++coluna) {
+            Posicao& posicao = obtemPosicao(linha, coluna);
+            Maquina* maquina = posicao.obtemMaquina();
+            if (maquina == nullptr) continue;
+            std::string evento;
+            maquina->preparaInstante(posicao.obtemTerreno(), instante, obtemGerador(), evento);
+            if (!evento.empty()) registaEvento(linha, coluna, evento);
+            if (posicao.transformaDepositoEsgotado()) {
+                registaEvento(linha, coluna, "Deposito esgotado");
+            }
+        }
+    }
+
+    // Só saem itens que já estavam na origem antes deste instante.
+    for (int linha = 0; linha < linhas; ++linha) {
+        for (int coluna = 0; coluna < colunas; ++coluna) {
+            Maquina* origem = obtemPosicao(linha, coluna).obtemMaquina();
+            if (origem == nullptr) continue;
+            const Item item = origem->itemParaEntregar(instante);
+            if (!item.existe()) continue;
+
+            int vizinhaLinha = linha;
+            int vizinhaColuna = coluna;
+            switch (origem->obtemDirecao()) {
+                case 'c': --vizinhaLinha; break;
+                case 'b': ++vizinhaLinha; break;
+                case 'e': --vizinhaColuna; break;
+                case 'd': ++vizinhaColuna; break;
+            }
+            Maquina* destino = contem(vizinhaLinha, vizinhaColuna)
+                ? obtemPosicao(vizinhaLinha, vizinhaColuna).obtemMaquina() : nullptr;
+            if (destino != nullptr && origem->tentaEntregar(*destino, instante)) {
+                const std::string vizinha{char('a' + vizinhaLinha), char('a' + vizinhaColuna)};
+                registaEvento(linha, coluna, std::string("Entregou ") + item.obtemNome() + " a " + vizinha);
+            } else {
+                registaEvento(linha, coluna, std::string("Bloqueada com ") + item.obtemNome());
+            }
+        }
+    }
 }
 
 void Fabrica::libertaRecursos() {
@@ -215,8 +306,6 @@ void Fabrica::libertaRecursos() {
             delete posicoes[linha][coluna];
             posicoes[linha][coluna] = nullptr;
 
-            delete terrenos[linha][coluna];
-            terrenos[linha][coluna] = nullptr;
         }
     }
 }

@@ -1,5 +1,5 @@
 #include "Ecra.h"
-#include <iostream>
+#include <ostream>
 
 // Construtor
 Ecra::Ecra(int nLinhas, int nColunas)
@@ -96,8 +96,8 @@ void Ecra::desenhaMoldura(int linha, int coluna, int altura, int largura) {
     if (altura <= 0 || largura <= 0)
         return;
 
-    const int ultimaLinha = linha + altura - 1;
-    const int ultimaColuna = coluna + largura - 1;
+    const long long ultimaLinha = static_cast<long long>(linha) + altura - 1;
+    const long long ultimaColuna = static_cast<long long>(coluna) + largura - 1;
 
     // Desenhar as linhas horizontais
     for (int j = 0; j < colunasUsadas; ++j) {
@@ -131,13 +131,10 @@ void Ecra::desenhaMoldura(int linha, int coluna, int altura, int largura) {
 }
 
 // Apresentar o conteúdo do buffer
-void Ecra::mostra() const {
+void Ecra::mostra(std::ostream& saida) const {
     for (int i = 0; i < linhasUsadas; ++i) {
-        for (int j = 0; j < colunasUsadas; ++j) {
-            std::cout << buffer[i][j];
-        }
-
-        std::cout << '\n';
+        saida.write(buffer[i], colunasUsadas);
+        saida.put('\n');
     }
 }
 

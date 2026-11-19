@@ -17,30 +17,6 @@ private:
     std::string descricaoAjuda;
 };
 
-class ComandoAvanca : public ComandoPendente {
-public:
-    ComandoAvanca();
-    bool valida(const std::string& argumentos, std::ostream& erros) const override;
-};
-
-class ComandoCompra : public ComandoPendente {
-public:
-    ComandoCompra();
-    bool valida(const std::string& argumentos, std::ostream& erros) const override;
-};
-
-class ComandoVende : public ComandoPendente {
-public:
-    ComandoVende();
-    bool valida(const std::string& argumentos, std::ostream& erros) const override;
-};
-
-class ComandoRoda : public ComandoPendente {
-public:
-    ComandoRoda();
-    bool valida(const std::string& argumentos, std::ostream& erros) const override;
-};
-
 class ComandoMelhora : public ComandoPendente {
 public:
     ComandoMelhora();
@@ -62,12 +38,6 @@ public:
 class ComandoDespede : public ComandoPendente {
 public:
     ComandoDespede();
-    bool valida(const std::string& argumentos, std::ostream& erros) const override;
-};
-
-class ComandoEstado : public ComandoPendente {
-public:
-    ComandoEstado();
     bool valida(const std::string& argumentos, std::ostream& erros) const override;
 };
 

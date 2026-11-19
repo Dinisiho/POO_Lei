@@ -8,8 +8,11 @@ class Ecra;
 
 class VistaFabrica {
 public:
+    static constexpr int alturaPainel = 13;
+
     void desenha(const Fabrica& fabrica, Ecra& ecra) const;
-    bool consultaTerrenos(const Fabrica& fabrica, int linha, int coluna,
+    void mostraEstado(const Fabrica& fabrica, std::ostream& saida) const;
+    bool consultaPosicoes(const Fabrica& fabrica, int linha, int coluna,
                          int raio, std::ostream& saida) const;
 };
 

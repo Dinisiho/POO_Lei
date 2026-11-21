@@ -10,7 +10,7 @@
 #include <string>
 
 namespace {
-    std::mt19937& obtemGerador() {
+    std::mt19937 &obtemGerador() {
         static std::random_device dispositivo;
         static std::mt19937 gerador(dispositivo());
         return gerador;
@@ -38,6 +38,7 @@ namespace {
             }
         }
     }
+
     void validaIntervaloDepositos() {
         if (Settings::deposito_quantidade_min < 0 ||
             Settings::deposito_quantidade_min > Settings::deposito_quantidade_max) {
@@ -45,7 +46,7 @@ namespace {
         }
     }
 
-    void removeRetornoCarro(std::string& linha) {
+    void removeRetornoCarro(std::string &linha) {
         if (!linha.empty() && linha.back() == '\r') {
             linha.pop_back();
         }
@@ -56,7 +57,6 @@ Fabrica::Fabrica(int nLinhas, int nColunas)
     : linhas(nLinhas),
       colunas(nColunas),
       creditos(Settings::fabrica_creditos_iniciais) {
-
     validaDimensoes();
     validaIntervaloDepositos();
 
@@ -82,7 +82,7 @@ Fabrica::Fabrica(int nLinhas, int nColunas)
 }
 
 
-Fabrica::Fabrica(const std::string& caminhoMapa)
+Fabrica::Fabrica(const std::string &caminhoMapa)
     : linhas(0), colunas(0),
       creditos(Settings::fabrica_creditos_iniciais) {
     validaIntervaloDepositos();
@@ -194,7 +194,7 @@ bool Fabrica::contem(int linha, int coluna) const {
     return linha >= 0 && linha < linhas && coluna >= 0 && coluna < colunas;
 }
 
-Posicao& Fabrica::obtemPosicao(int linha, int coluna) {
+Posicao &Fabrica::obtemPosicao(int linha, int coluna) {
     if (!contem(linha, coluna)) {
         throw std::string("Posicao fora dos limites da fabrica.");
     }
@@ -202,7 +202,7 @@ Posicao& Fabrica::obtemPosicao(int linha, int coluna) {
     return *posicoes[linha][coluna];
 }
 
-const Posicao& Fabrica::obtemPosicao(int linha, int coluna) const {
+const Posicao &Fabrica::obtemPosicao(int linha, int coluna) const {
     if (!contem(linha, coluna)) {
         throw std::string("Posicao fora dos limites da fabrica.");
     }
@@ -210,13 +210,21 @@ const Posicao& Fabrica::obtemPosicao(int linha, int coluna) const {
     return *posicoes[linha][coluna];
 }
 
-const char* Fabrica::compra(char tipo, int linha, int coluna, char direcao) {
-    if (!contem(linha, coluna)) return "Posicao fora da fabrica.";
+std::string Fabrica::compra(char tipo, int linha, int coluna, char direcao) {
+    if (!contem(linha, coluna)) {
+        return "Posicao fora da fabrica.";
+    }
     Posicao& posicao = obtemPosicao(linha, coluna);
-    if (posicao.obtemMaquina() != nullptr) return "A posicao ja tem uma maquina.";
-    if (!posicao.obtemTerreno().permiteMaquina()) return "Nao se pode comprar numa cratera.";
+    if (posicao.obtemMaquina() != nullptr) {
+        return "A posicao ja tem uma maquina.";
+    }
+    if (!posicao.obtemTerreno().permiteMaquina()) {
+        return "Nao se pode comprar numa cratera.";
+    }
     Maquina* maquina = Maquina::cria(tipo, direcao);
-    if (maquina == nullptr) return "Tipo de maquina ou direcao invalida.";
+    if (maquina == nullptr) {
+        return "Tipo de maquina ou direcao invalida.";
+    }
     if (creditos < maquina->obtemCusto()) {
         delete maquina;
         return "Creditos insuficientes.";
@@ -224,28 +232,38 @@ const char* Fabrica::compra(char tipo, int linha, int coluna, char direcao) {
     creditos -= maquina->obtemCusto();
     posicao.instalaMaquina(maquina);
     ++numeroMaquinas;
-    return nullptr;
+    return "";
 }
 
-const char* Fabrica::vende(int linha, int coluna) {
-    if (!contem(linha, coluna)) return "Posicao fora da fabrica.";
+std::string Fabrica::vende(int linha, int coluna) {
+    if (!contem(linha, coluna)) {
+        return "Posicao fora da fabrica.";
+    }
     Posicao& posicao = obtemPosicao(linha, coluna);
     const Maquina* maquina = posicao.obtemMaquina();
-    if (maquina == nullptr) return "A posicao nao tem maquina.";
+    if (maquina == nullptr) {
+        return "A posicao nao tem maquina.";
+    }
     creditos += static_cast<long long>(maquina->obtemCusto()) *
                 Settings::maquina_percentagem_venda / 100;
     posicao.removeMaquina();
     --numeroMaquinas;
-    return nullptr;
+    return "";
 }
 
-const char* Fabrica::roda(int linha, int coluna, char direcao) {
-    if (!contem(linha, coluna)) return "Posicao fora da fabrica.";
-    if (!Maquina::direcaoValida(direcao)) return "Direcao invalida.";
+std::string Fabrica::roda(int linha, int coluna, char direcao) {
+    if (!contem(linha, coluna)) {
+        return "Posicao fora da fabrica.";
+    }
+    if (!Maquina::direcaoValida(direcao)) {
+        return "Direcao invalida.";
+    }
     Maquina* maquina = obtemPosicao(linha, coluna).obtemMaquina();
-    if (maquina == nullptr) return "A posicao nao tem maquina.";
+    if (maquina == nullptr) {
+        return "A posicao nao tem maquina.";
+    }
     maquina->roda(direcao);
-    return nullptr;
+    return "";
 }
 
 void Fabrica::registaEvento(int linha, int coluna, const std::string& descricao) {

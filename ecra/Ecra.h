@@ -19,11 +19,13 @@ public:
 
     // Escreve a partir da posição atual do cursor
     void escreve(char caracter);
-    void escreve(const std::string& texto);
+
+    void escreve(const std::string &texto);
 
     // Escreve numa posição específica
     void escreve(int linha, int coluna, char caracter);
-    void escreve(int linha, int coluna, const std::string& texto);
+
+    void escreve(int linha, int coluna, const std::string &texto);
 
     // Desenha uma moldura retangular
     void desenhaMoldura(int linha, int coluna, int altura, int largura);
@@ -33,6 +35,7 @@ public:
 
     // Consulta as dimensões utilizadas
     int obtemLinhas() const;
+
     int obtemColunas() const;
 
 private:

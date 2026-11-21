@@ -39,15 +39,15 @@ public:
     inline static const int deposito_quantidade_max = 60;
 
     // ----- Máquinas (comum) -----
-    inline static const int maquina_percentagem_venda = 50;   // % do custo devolvida ao vender
-    inline static const int maquina_duracao_minima = 1;       // duração mínima de uma operação (com engenheiros)
+    inline static const int maquina_percentagem_venda = 50; // % do custo devolvida ao vender
+    inline static const int maquina_duracao_minima = 1; // duração mínima de uma operação (com engenheiros)
 
     // ----- Perfuradora -----
     inline static const int perfuradora_custo = 100;
-    inline static const int perfuradora_periodo = 3;                 // extrai 1 unidade a cada N instantes
-    inline static const int perfuradora_capacidade = 1;              // itens por entregar que pode guardar
-    inline static const int perfuradora_prob_perda = 40;             // % de o item extraído se perder
-    inline static const int perfuradora_melhoria_reducao_prob = 10;  // pontos percentuais por melhoria
+    inline static const int perfuradora_periodo = 3; // extrai 1 unidade a cada N instantes
+    inline static const int perfuradora_capacidade = 1; // itens por entregar que pode guardar
+    inline static const int perfuradora_prob_perda = 40; // % de o item extraído se perder
+    inline static const int perfuradora_melhoria_reducao_prob = 10; // pontos percentuais por melhoria
     inline static const int perfuradora_melhoria_custo = 15;
 
     // ----- Transportador -----
@@ -65,27 +65,27 @@ public:
     inline static const int oficina_receita_silicio_puro = 1;
     inline static const int oficina_receita_agua = 1;
     inline static const int oficina_receita_kits_produzidos = 1;
-    inline static const int oficina_melhoria_reducao_duracao = 1;    // instantes a menos por melhoria
+    inline static const int oficina_melhoria_reducao_duracao = 1; // instantes a menos por melhoria
     inline static const int oficina_melhoria_custo = 30;
-    inline static const int oficina_melhoria_max = 1;                // número máximo de melhorias
+    inline static const int oficina_melhoria_max = 1; // número máximo de melhorias
 
     // ----- Silo -----
     inline static const int silo_custo = 120;
-    inline static const int silo_prob_perda = 20;                    // % de perder o item mais antigo, por instante
-    inline static const int silo_melhoria_reducao_prob = 5;          // pontos percentuais por melhoria
+    inline static const int silo_prob_perda = 20; // % de perder o item mais antigo, por instante
+    inline static const int silo_melhoria_reducao_prob = 5; // pontos percentuais por melhoria
     inline static const int silo_melhoria_custo = 50;
 
     // ----- Lançador -----
     inline static const int lancador_custo = 80;
-    inline static const int lancador_recarga = 4;                    // envia 1 item a cada N instantes
-    inline static const int lancador_prob_perda = 30;                // % de o item se perder no lançamento
-    inline static const int lancador_melhoria_reducao_prob = 10;     // pontos percentuais por melhoria
+    inline static const int lancador_recarga = 4; // envia 1 item a cada N instantes
+    inline static const int lancador_prob_perda = 30; // % de o item se perder no lançamento
+    inline static const int lancador_melhoria_reducao_prob = 10; // pontos percentuais por melhoria
     inline static const int lancador_melhoria_custo = 25;
 
     // ----- Engenheiros -----
     inline static const int engenheiro_custo_contratacao = 50;
-    inline static const int engenheiro_salario = 1;                  // créditos por instante
-    inline static const int engenheiro_reducao_duracao = 1;          // instantes a menos por engenheiro
+    inline static const int engenheiro_salario = 1; // créditos por instante
+    inline static const int engenheiro_reducao_duracao = 1; // instantes a menos por engenheiro
 
     // ----- Itens: valor em créditos -----
     inline static const int valor_minerio_ferro = 2;

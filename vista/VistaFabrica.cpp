@@ -6,6 +6,7 @@
 #include "../terreno/terreno.h"
 
 #include <ostream>
+#include <vector>
 #include <string>
 
 void VistaFabrica::desenha(const Fabrica& fabrica, Ecra& ecra) const {
@@ -44,7 +45,7 @@ void VistaFabrica::desenha(const Fabrica& fabrica, Ecra& ecra) const {
     ecra.escreve(4, texto, std::string("Engenheiros: 0").substr(0, larguraTexto));
     ecra.escreve(6, texto, std::string("No ultimo instante:").substr(0, larguraTexto));
 
-    const auto& eventos = fabrica.obtemEventos();
+    const std::vector<std::string>& eventos = fabrica.obtemEventos();
     if (eventos.empty()) ecra.escreve(7, texto, std::string("Sem eventos").substr(0, larguraTexto));
     const std::size_t limite = eventos.size() > 5 ? 4 : eventos.size();
     for (std::size_t i = 0; i < limite; ++i) {

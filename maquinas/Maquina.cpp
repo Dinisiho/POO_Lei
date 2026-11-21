@@ -4,7 +4,7 @@
 
 #include <ostream>
 
-Maquina::Maquina(const char* nome, char simbolo, int custo, char direcao)
+Maquina::Maquina(const std::string& nome, char simbolo, int custo, char direcao)
     : nome(nome), simbolo(simbolo), custo(custo), direcao(direcao) {}
 
 Maquina* Maquina::cria(char tipo, char direcao) {

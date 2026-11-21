@@ -2,6 +2,8 @@
 #include "Interpretador.h"
 
 #include <ostream>
+#include <string>
+#include <vector>
 
 const std::string& ComandoAjuda::nome() const {
     static const std::string valor = "ajuda";
@@ -14,7 +16,7 @@ bool ComandoAjuda::valida(const std::string& argumentos, std::ostream& erros) co
 
 void ComandoAjuda::executa(Interpretador& interpretador, const std::string& argumentos,
                           std::ostream& saida) const {
-    const auto parametros = separa(argumentos);
+    const std::vector<std::string> parametros = separa(argumentos);
     interpretador.mostraAjuda(parametros.empty() ? "" : parametros[0], saida);
 }
 

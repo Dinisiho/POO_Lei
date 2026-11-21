@@ -11,6 +11,7 @@ public:
     void executa(Interpretador& interpretador, const std::string& argumentos,
                 std::ostream& saida) const override;
     void ajuda(std::ostream& saida) const override;
+    bool estaPendente() const override;
 
 private:
     std::string nomeComando;

@@ -2,6 +2,8 @@
 #include "Interpretador.h"
 
 #include <ostream>
+#include <string>
+#include <vector>
 
 ComandoPendente::ComandoPendente(const std::string& nome,
                                  const std::string& descricao)
@@ -19,6 +21,11 @@ void ComandoPendente::executa(Interpretador&, const std::string&,
           << "': parametros validos. Operacao reservada para a entrega final.\n";
 }
 
+bool ComandoPendente::estaPendente() const {
+    return true;
+}
+
+
 ComandoMelhora::ComandoMelhora()
     : ComandoPendente("melhora",
         "melhora <lc>\n"
@@ -28,7 +35,7 @@ ComandoMelhora::ComandoMelhora()
         "  Exemplo: melhora hi\n") {}
 
 bool ComandoMelhora::valida(const std::string& argumentos, std::ostream& erros) const {
-    const auto p = separa(argumentos);
+    const std::vector<std::string> p = separa(argumentos);
     if (!quantidadeValida(p, 1, 1, erros)) return false;
     if (!posicaoValida(p[0])) {
         erros << "Erro: posicao invalida.\n";
@@ -58,7 +65,7 @@ ComandoAtribui::ComandoAtribui()
         "  Exemplo: atribui 2 hr\n") {}
 
 bool ComandoAtribui::valida(const std::string& argumentos, std::ostream& erros) const {
-    const auto p = separa(argumentos);
+    const std::vector<std::string> p = separa(argumentos);
     if (!quantidadeValida(p, 2, 2, erros)) return false;
     int id;
     if (!numeroInteiro(p[0], id) || id <= 0 || !posicaoValida(p[1])) {
@@ -77,7 +84,7 @@ ComandoDespede::ComandoDespede()
         "  Exemplo: despede 2\n") {}
 
 bool ComandoDespede::valida(const std::string& argumentos, std::ostream& erros) const {
-    const auto p = separa(argumentos);
+    const std::vector<std::string> p = separa(argumentos);
     if (!quantidadeValida(p, 1, 1, erros)) return false;
     int id;
     if (!numeroInteiro(p[0], id) || id <= 0) {
@@ -111,3 +118,5 @@ ComandoRecupera::ComandoRecupera()
 bool ComandoRecupera::valida(const std::string& argumentos, std::ostream& erros) const {
     return quantidadeValida(separa(argumentos), 1, 1, erros);
 }
+
+

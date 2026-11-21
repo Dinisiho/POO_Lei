@@ -51,10 +51,14 @@ bool Deposito::esgotado() const { return qRestante <= 0; }
 std::string Deposito::descricao() const {
     std::string recurso;
     switch (tipoRecurso) {
-        case '%': recurso = "minerio de ferro"; break;
-        case '$': recurso = "silicio bruto"; break;
-        case '~': recurso = "gelo"; break;
-        default: recurso = "desconhecido"; break;
+        case '%': recurso = "minerio de ferro";
+            break;
+        case '$': recurso = "silicio bruto";
+            break;
+        case '~': recurso = "gelo";
+            break;
+        default: recurso = "desconhecido";
+            break;
     }
     return "Deposito de " + recurso + " (" + std::to_string(qRestante) + " unidades)";
 }

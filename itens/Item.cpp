@@ -3,7 +3,7 @@
 
 namespace {
     struct DadosItem {
-        const char* nome;
+        std::string nome;
         char simbolo;
         int valor;
     };
@@ -26,13 +26,13 @@ bool Item::existe() const {
     return tipo > Tipo::Vazio && tipo < Tipo::Total;
 }
 
-const char* Item::obtemNome() const {
+std::string Item::obtemNome() const {
     return existe() ? dados[static_cast<int>(tipo)].nome : dados[0].nome;
 }
 
 std::string Item::descricao() const {
     if (!existe()) return obtemNome();
     const DadosItem& info = dados[static_cast<int>(tipo)];
-    return std::string(info.nome) + " (" + info.simbolo + ", " +
+    return info.nome + " (" + info.simbolo + ", " +
            std::to_string(info.valor) + " creditos)";
 }

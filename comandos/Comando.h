@@ -18,6 +18,7 @@ public:
                         std::ostream& saida) const = 0;
     virtual void ajuda(std::ostream& saida) const = 0;
     virtual bool exigeFabrica() const { return true; }
+   virtual bool estaPendente() const { return false; }
 
 protected:
     static std::vector<std::string> separa(const std::string& argumentos);

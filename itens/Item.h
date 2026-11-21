@@ -10,7 +10,7 @@ public:
     Item() = default;
     explicit Item(Tipo tipo);
     bool existe() const;
-    const char* obtemNome() const;
+    std::string obtemNome() const;
     std::string descricao() const;
 
 private:

@@ -4,11 +4,14 @@
 #include "../vista/VistaFabrica.h"
 
 #include <ostream>
+#include <string>
+#include <vector>
 
 namespace {
-    void apresentaAlteracao(Interpretador& interpretador, const char* erro,
-                            const char* confirmacao, std::ostream& saida) {
-        if (erro != nullptr) {
+    void apresentaAlteracao(Interpretador& interpretador,
+                            const std::string& erro, const std::string& confirmacao,
+                            std::ostream& saida) {
+        if (!erro.empty()) {
             saida << "Erro: " << erro << '\n';
             return;
         }
@@ -23,7 +26,7 @@ const std::string& ComandoCompra::nome() const {
 }
 
 bool ComandoCompra::valida(const std::string& argumentos, std::ostream& erros) const {
-    const auto p = separa(argumentos);
+    const std::vector<std::string> p = separa(argumentos);
     if (!quantidadeValida(p, 3, 3, erros)) return false;
     if (!tipoMaquinaValido(p[0]) || !posicaoValida(p[1]) || !direcaoValida(p[2])) {
         erros << "Erro: tipo, posicao ou direcao invalido.\n";
@@ -34,8 +37,8 @@ bool ComandoCompra::valida(const std::string& argumentos, std::ostream& erros) c
 
 void ComandoCompra::executa(Interpretador& interpretador, const std::string& argumentos,
                             std::ostream& saida) const {
-    const auto p = separa(argumentos);
-    const char* erro = interpretador.obtemFabrica().compra(
+    const std::vector<std::string> p = separa(argumentos);
+    const std::string erro = interpretador.obtemFabrica().compra(
         p[0][0], p[1][0] - 'a', p[1][1] - 'a', p[2][0]);
     apresentaAlteracao(interpretador, erro, "Maquina comprada.", saida);
 }
@@ -55,7 +58,7 @@ const std::string& ComandoVende::nome() const {
 }
 
 bool ComandoVende::valida(const std::string& argumentos, std::ostream& erros) const {
-    const auto p = separa(argumentos);
+    const std::vector<std::string> p = separa(argumentos);
     if (!quantidadeValida(p, 1, 1, erros)) return false;
     if (!posicaoValida(p[0])) {
         erros << "Erro: posicao invalida.\n";
@@ -66,8 +69,8 @@ bool ComandoVende::valida(const std::string& argumentos, std::ostream& erros) co
 
 void ComandoVende::executa(Interpretador& interpretador, const std::string& argumentos,
                            std::ostream& saida) const {
-    const auto p = separa(argumentos);
-    const char* erro = interpretador.obtemFabrica().vende(p[0][0] - 'a', p[0][1] - 'a');
+    const std::vector<std::string> p = separa(argumentos);
+    const std::string erro = interpretador.obtemFabrica().vende(p[0][0] - 'a', p[0][1] - 'a');
     apresentaAlteracao(interpretador, erro, "Maquina vendida.", saida);
 }
 
@@ -85,7 +88,7 @@ const std::string& ComandoRoda::nome() const {
 }
 
 bool ComandoRoda::valida(const std::string& argumentos, std::ostream& erros) const {
-    const auto p = separa(argumentos);
+    const std::vector<std::string> p = separa(argumentos);
     if (!quantidadeValida(p, 2, 2, erros)) return false;
     if (!posicaoValida(p[0]) || !direcaoValida(p[1])) {
         erros << "Erro: posicao ou direcao invalida.\n";
@@ -96,8 +99,8 @@ bool ComandoRoda::valida(const std::string& argumentos, std::ostream& erros) con
 
 void ComandoRoda::executa(Interpretador& interpretador, const std::string& argumentos,
                           std::ostream& saida) const {
-    const auto p = separa(argumentos);
-    const char* erro = interpretador.obtemFabrica().roda(p[0][0] - 'a', p[0][1] - 'a', p[1][0]);
+    const std::vector<std::string> p = separa(argumentos);
+    const std::string erro = interpretador.obtemFabrica().roda(p[0][0] - 'a', p[0][1] - 'a', p[1][0]);
     apresentaAlteracao(interpretador, erro, "Direcao atualizada.", saida);
 }
 
@@ -114,7 +117,7 @@ const std::string& ComandoAvanca::nome() const {
 }
 
 bool ComandoAvanca::valida(const std::string& argumentos, std::ostream& erros) const {
-    const auto p = separa(argumentos);
+    const std::vector<std::string> p = separa(argumentos);
     if (!quantidadeValida(p, 0, 1, erros)) return false;
     int n;
     if (!p.empty() && (!numeroInteiro(p[0], n) || n <= 0)) {
@@ -126,7 +129,7 @@ bool ComandoAvanca::valida(const std::string& argumentos, std::ostream& erros) c
 
 void ComandoAvanca::executa(Interpretador& interpretador, const std::string& argumentos,
                             std::ostream& saida) const {
-    const auto p = separa(argumentos);
+    const std::vector<std::string> p = separa(argumentos);
     int n = 1;
     if (!p.empty()) numeroInteiro(p[0], n);
     for (int i = 0; i < n; ++i) {

@@ -27,9 +27,10 @@ public:
     Posicao& obtemPosicao(int linha, int coluna);
     const Posicao& obtemPosicao(int linha, int coluna) const;
 
-    const char* compra(char tipo, int linha, int coluna, char direcao);
-    const char* vende(int linha, int coluna);
-    const char* roda(int linha, int coluna, char direcao);
+    // Devolvem uma string vazia no sucesso ou a mensagem de erro na falha.
+    std::string compra(char tipo, int linha, int coluna, char direcao);
+    std::string vende(int linha, int coluna);
+    std::string roda(int linha, int coluna, char direcao);
     void avanca();
 
 private:

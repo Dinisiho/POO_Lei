@@ -3,6 +3,8 @@
 #include "../settings/Settings.h"
 
 #include <ostream>
+#include <string>
+#include <vector>
 
 const std::string& ComandoFabrica::nome() const {
     static const std::string valor = "fabrica";
@@ -10,7 +12,7 @@ const std::string& ComandoFabrica::nome() const {
 }
 
 bool ComandoFabrica::valida(const std::string& argumentos, std::ostream& erros) const {
-    const auto p = separa(argumentos);
+    const std::vector<std::string> p = separa(argumentos);
     if (!quantidadeValida(p, 2, 2, erros)) return false;
     int linhas, colunas;
     if (!numeroInteiro(p[0], linhas) || !numeroInteiro(p[1], colunas) ||
@@ -24,7 +26,7 @@ bool ComandoFabrica::valida(const std::string& argumentos, std::ostream& erros) 
 
 void ComandoFabrica::executa(Interpretador& interpretador, const std::string& argumentos,
                             std::ostream& saida) const {
-    const auto p = separa(argumentos);
+    const std::vector<std::string> p = separa(argumentos);
     int linhas, colunas;
     numeroInteiro(p[0], linhas);
     numeroInteiro(p[1], colunas);
@@ -68,7 +70,7 @@ const std::string& ComandoLPosicao::nome() const {
 }
 
 bool ComandoLPosicao::valida(const std::string& argumentos, std::ostream& erros) const {
-    const auto p = separa(argumentos);
+    const std::vector<std::string> p = separa(argumentos);
     if (!quantidadeValida(p, 1, 2, erros)) return false;
     int raio = 0;
     if (!posicaoValida(p[0]) || (p.size() == 2 &&
@@ -81,7 +83,7 @@ bool ComandoLPosicao::valida(const std::string& argumentos, std::ostream& erros)
 
 void ComandoLPosicao::executa(Interpretador& interpretador, const std::string& argumentos,
                              std::ostream& saida) const {
-    const auto p = separa(argumentos);
+    const std::vector<std::string> p = separa(argumentos);
     int raio = 0;
     if (p.size() == 2) numeroInteiro(p[1], raio);
     interpretador.consultaPosicoes(p[0][0] - 'a', p[0][1] - 'a', raio, saida);

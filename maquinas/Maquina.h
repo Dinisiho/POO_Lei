@@ -28,11 +28,11 @@ public:
     bool tentaEntregar(Maquina& destino, long long instante);
 
 protected:
-    Maquina(const char* nome, char simbolo, int custo, char direcao);
+    Maquina(const std::string& nome, char simbolo, int custo, char direcao);
     virtual void descreveConteudo(std::ostream& saida, bool detalhe) const;
 
 private:
-    const char* nome;
+    std::string nome;
     char simbolo;
     int custo;
     char direcao;

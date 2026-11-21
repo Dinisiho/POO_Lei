@@ -10,7 +10,6 @@
 #include "../settings/Settings.h"
 #include "../vista/VistaFabrica.h"
 
-#include <filesystem>
 #include <ostream>
 #include <sstream>
 #include <utility>
@@ -85,8 +84,7 @@ void Interpretador::processaLinha(const std::string& linha, std::ostream& saida)
 
 void Interpretador::executaFicheiro(const std::string& caminho, std::ostream& saida) {
     for (const FicheiroComandos& ativo : ficheirosEmExecucao) {
-        std::error_code erro;
-        if (ativo.caminho == caminho || std::filesystem::equivalent(ativo.caminho, caminho, erro)) {
+        if (ativo.caminho == caminho) {
             saida << "Erro: execucao recursiva do mesmo ficheiro: " << caminho << "\n";
             return;
         }
@@ -129,7 +127,11 @@ void Interpretador::mostraAjuda(const std::string& nomeComando, std::ostream& sa
             std::istringstream linhas(texto.str());
             std::string sintaxe;
             std::getline(linhas, sintaxe);
-            saida << "  " << sintaxe << '\n';
+            saida << "  " << sintaxe ;
+            if (comando->estaPendente()) {
+               saida << " - (Pendente)";
+            }
+          saida << '\n';
         }
         return;
     }

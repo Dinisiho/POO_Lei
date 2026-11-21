@@ -8,7 +8,7 @@ class Ecra;
 
 class VistaFabrica {
 public:
-    static constexpr int alturaPainel = 13;
+    static const int alturaPainel = 13;
 
     void desenha(const Fabrica& fabrica, Ecra& ecra) const;
     void mostraEstado(const Fabrica& fabrica, std::ostream& saida) const;
@@ -17,3 +17,4 @@ public:
 };
 
 #endif
+            

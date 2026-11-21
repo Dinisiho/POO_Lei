@@ -2,7 +2,6 @@
 #define SILO_H
 
 #include "Maquina.h"
-#include <cstddef>
 
 class Silo : public Maquina {
 public:
@@ -20,7 +19,7 @@ private:
 
     No* primeiro = nullptr;
     No* ultimo = nullptr;
-    std::size_t quantidade = 0;
+    long long quantidade = 0;
 
     void descreveConteudo(std::ostream& saida, bool detalhe) const override;
     Item obtemSaida(long long instante) const override;

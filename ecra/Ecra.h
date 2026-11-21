@@ -28,7 +28,7 @@ public:
     void escreve(int linha, int coluna, const std::string &texto);
 
     // Desenha uma moldura retangular
-    void desenhaMoldura(int linha, int coluna, int altura, int largura);
+    void desenhaMoldura(long long linha, long long coluna, int altura, int largura);
 
     // Apresenta o conteúdo do buffer na consola
     void mostra(std::ostream& saida) const;

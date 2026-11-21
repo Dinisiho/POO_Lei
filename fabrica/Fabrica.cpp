@@ -64,10 +64,15 @@ Fabrica::Fabrica(int nLinhas, int nColunas)
     int numFerro = Settings::fabrica_num_depositos_ferro;
     int numSilicio = Settings::fabrica_num_depositos_silicio;
     int numGelo = Settings::fabrica_num_depositos_gelo;
-    long long totalEspeciais = static_cast<long long>(numCrateras) + numFerro + numSilicio + numGelo;
-
+    const int capacidade = linhas * colunas;
+    // Validar antes da soma: cada quantidade fica limitada pela grelha.
     if (numCrateras < 0 || numFerro < 0 || numSilicio < 0 || numGelo < 0 ||
-        totalEspeciais > linhas * colunas) {
+        numCrateras > capacidade || numFerro > capacidade ||
+        numSilicio > capacidade || numGelo > capacidade) {
+        throw std::string("A fabrica nao tem posicoes suficientes para os terrenos definidos em Settings.");
+    }
+    const int totalEspeciais = numCrateras + numFerro + numSilicio + numGelo;
+    if (totalEspeciais > capacidade) {
         throw std::string("A fabrica nao tem posicoes suficientes para os terrenos definidos em Settings.");
     }
 
@@ -182,7 +187,7 @@ int Fabrica::obtemColunas() const {
     return colunas;
 }
 
-long long Fabrica::obtemCreditos() const {
+int Fabrica::obtemCreditos() const {
     return creditos;
 }
 
@@ -244,7 +249,8 @@ std::string Fabrica::vende(int linha, int coluna) {
     if (maquina == nullptr) {
         return "A posicao nao tem maquina.";
     }
-    creditos += static_cast<long long>(maquina->obtemCusto()) *
+    const long long custo = maquina->obtemCusto();
+    creditos += custo *
                 Settings::maquina_percentagem_venda / 100;
     posicao.removeMaquina();
     --numeroMaquinas;

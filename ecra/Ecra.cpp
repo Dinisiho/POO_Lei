@@ -92,12 +92,12 @@ void Ecra::escreve(int linha, int coluna, const std::string& texto) {
 }
 
 // Desenhar uma moldura retangular
-void Ecra::desenhaMoldura(int linha, int coluna, int altura, int largura) {
-    if (altura <= 0 || largura <= 0)
+void Ecra::desenhaMoldura(long long linha, long long coluna, int altura, int largura) {
+    if (altura <= 0 || largura <= 0 || linha >= linhasUsadas || coluna >= colunasUsadas)
         return;
 
-    const long long ultimaLinha = static_cast<long long>(linha) + altura - 1;
-    const long long ultimaColuna = static_cast<long long>(coluna) + largura - 1;
+    const long long ultimaLinha = linha + (altura - 1);
+    const long long ultimaColuna = coluna + (largura - 1);
 
     // Desenhar as linhas horizontais
     for (int j = 0; j < colunasUsadas; ++j) {

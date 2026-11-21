@@ -18,7 +18,7 @@ public:
 
     int obtemLinhas() const;
     int obtemColunas() const;
-    long long obtemCreditos() const;
+    int obtemCreditos() const;
     long long obtemInstante() const;
     int obtemNumeroMaquinas() const;
     const std::vector<std::string>& obtemEventos() const;
@@ -36,7 +36,7 @@ public:
 private:
     int linhas;
     int colunas;
-    long long creditos;
+    int creditos;
     long long instante = 0;
     int numeroMaquinas = 0;
     std::vector<std::string> eventos;
